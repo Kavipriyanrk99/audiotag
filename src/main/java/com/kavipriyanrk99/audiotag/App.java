@@ -16,17 +16,6 @@ public class App {
     private static String filename;
     private static String format;
 
-    public static void setFilepath(String filepath) throws FileNotFoundException {
-        if (filepath != null && !filepath.isEmpty()) {
-            File audiofile = new File(filepath);
-            if (audiofile.exists())
-                App.filepath = filepath;
-            else
-                throw new FileNotFoundException("[ERROR] Input file doesn't exist");
-        } else
-            throw new IllegalArgumentException("[ERROR] Empty filepath");
-    }
-
     public static void setFileProperties(String filepath) throws FileNotFoundException {
         Set<String> audiofileExts = new HashSet<>();
         Collections.addAll(audiofileExts, "mp3");
@@ -46,7 +35,7 @@ public class App {
                     App.filename = fileWithoutExt;
                     App.format = fileExt;
                 } else
-                    throw new IllegalArgumentException("[ERROR] Input is not an audio file");
+                    throw new IllegalArgumentException("[ERROR] Input is not an supported audio file");
             } else
                 throw new FileNotFoundException("[ERROR] Input file doesn't exist");
         } else
@@ -59,22 +48,25 @@ public class App {
         System.out.println("> ENTER FILEPATH:");
         try {
             App.setFileProperties(sc.nextLine());
+            AbstractAudioFile audiofile = null;
 
             switch (format) {
                 case "mp3":
-                    Mp3AudioFile mp3AudioFile = new Mp3AudioFile();
-                    mp3AudioFile.setSongDetails(filename, filepath, format);
+                    audiofile = new Mp3AudioFile();
+                    audiofile.setSongDetails(filename, filepath, format);
+            }
 
-                    System.out.println("<-------------------------- SONG DETAILS-------------------------->");
-                    Map<String, String> songDetails = mp3AudioFile.getSongDetails();
-                    System.out.println("MUSIC FILE NAME     :   " + songDetails.get("filename"));
-                    System.out.println("MUSIC TYPE          :   " + songDetails.get("format"));
-                    System.out.println("DURATION            :   " + songDetails.get("duration"));
-                    System.out.println("BITRATE             :   " + songDetails.get("bitrate") + "(kbps)");
-                    System.out.println("SAMPLE RATE         :   " + songDetails.get("samplerate") + "(Hz)");
-                    System.out.println("ID3V1 TAG (yes/no)  :   " + songDetails.get("id3v1"));
-                    System.out.println("ID3V2 TAG (yes/no)  :   " + songDetails.get("id3v2"));
-                    System.out.println("CUSTOM TAG (yes/no) :   " + songDetails.get("customtag"));
+            if(audiofile != null) {
+                System.out.println("<-------------------------- SONG DETAILS -------------------------->");
+                Map<String, String> songDetails = audiofile.getSongDetails();
+                System.out.println("MUSIC FILE NAME     :   " + songDetails.get("filename"));
+                System.out.println("MUSIC TYPE          :   " + songDetails.get("format"));
+                System.out.println("DURATION            :   " + songDetails.get("duration"));
+                System.out.println("BITRATE             :   " + songDetails.get("bitrate") + "(kbps)");
+                System.out.println("SAMPLE RATE         :   " + songDetails.get("samplerate") + "(Hz)");
+                System.out.println("ID3V1 TAG (yes/no)  :   " + songDetails.get("id3v1"));
+                System.out.println("ID3V2 TAG (yes/no)  :   " + songDetails.get("id3v2"));
+                System.out.println("CUSTOM TAG (yes/no) :   " + songDetails.get("customtag"));
             }
         } catch (FileNotFoundException e) {
             System.out.println(e);
