@@ -35,7 +35,7 @@ public class PropertyLoader {
             throw new IllegalArgumentException("[ERROR] Invalid CLIENT_SECRET loaded");
 	}
 
-    public void loadProperties() {
+    PropertyLoader() {
         Properties properties = new Properties();
         InputStream inputStream = PropertyLoader.class.getClassLoader().getResourceAsStream(PROPERTIES_FILENAME);
 
