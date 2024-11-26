@@ -19,10 +19,10 @@ import org.json.JSONObject;
  */
 public class APIHandler {
 
-    private String accessToken;
-    private String tokenType;
+    private static String accessToken;
+    private static String tokenType;
 
-    private String makeHttpRequest(URI requestUri, String token, String contentType, String method,
+    static String makeHttpRequest(URI requestUri, String token, String contentType, String method,
             BodyPublisher bodyPublisher)
             throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
@@ -41,7 +41,7 @@ public class APIHandler {
         return response.body();
     }
 
-    void setAccessToken() {
+    static void setAccessToken() {
         PropertyLoader.loadProperties();
         try {
             URI requestUri = new URI(PropertyLoader.getAUTH_URL());
@@ -69,4 +69,12 @@ public class APIHandler {
             System.out.println(e);
         }
     }
+
+	public static String getAccessToken() {
+		return accessToken;
+	}
+
+	public static String getTokenType() {
+		return tokenType;
+	}
 }
