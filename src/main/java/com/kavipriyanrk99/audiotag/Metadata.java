@@ -5,6 +5,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,8 +46,7 @@ public class Metadata {
 
             for (Object item : items) {
                 if (item instanceof JSONObject) {
-                    JSONObject jsonObjItem = null;
-                    jsonObjItem = (JSONObject) item;
+                    JSONObject jsonObjItem = (JSONObject) item;
                     JSONObject album = (JSONObject) jsonObjItem.get("album");
                     JSONArray images = (JSONArray) album.get("images");
                     JSONArray artists = (JSONArray) jsonObjItem.get("artists");
@@ -65,8 +67,9 @@ public class Metadata {
                     String albumName = (String) album.get("name");
                     String releaseDate = (String) album.get("release_date");
                     String releaseYear = releaseDate.substring(0, releaseDate.indexOf('-'));
+                    String albumImageURL = (String) ((JSONObject) images.get(1)).get("url"); // 300 x 300
                     String artistName = null;
-                    String albumImageURL = (String)((JSONObject)images.get(1)).get("url");
+                    String audioPreviewURL = null;
 
                     for (Object jsonObjArtist : artists) {
                         if (jsonObjArtist instanceof JSONObject) {
@@ -76,12 +79,18 @@ public class Metadata {
                             else
                                 artistName = artistName + ", " + artist.get("name");
                         } else
-                            throw new IllegalStateException("[ERROR] Invalid JSON data");
+                            throw new IllegalStateException("[ERROR] Invalid JSON data while parsing");
                     }
 
-                    System.out.println(title + " " + albumName + " " + albumImageURL +  " " + releaseDate + " " + releaseYear + " " + artistName);
+                    if (jsonObjItem.get("preview_url") == null)
+                        audioPreviewURL = (String) jsonObjItem.get("preview_url");
+                    else
+                        audioPreviewURL = "No Preview URL";
+
+                    System.out.println(title + "\n" + albumName + "\n" + albumImageURL + "\n" + releaseDate + "\n"
+                            + releaseYear + "\n" + artistName + "\n" + audioPreviewURL);
                 } else
-                    throw new IllegalStateException("[ERROR] Invalid JSON data");
+                    throw new IllegalStateException("[ERROR] Invalid JSON data while parsing");
             }
         } catch (URISyntaxException e) {
             System.out.println(e);
@@ -99,6 +108,6 @@ public class Metadata {
     }
 
     public static void main(String[] args) {
-        new Metadata().getMetadata("hey minnaley");
+        new Metadata().getMetadata("Enemy");
     }
 }
