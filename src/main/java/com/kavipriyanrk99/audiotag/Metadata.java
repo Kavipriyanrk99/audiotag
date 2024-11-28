@@ -28,9 +28,7 @@ public class Metadata {
             throw new IllegalArgumentException("[ERROR] Invalid token type");
 
         try {
-            String uri = String.format("%sv1/search?q=%s&type=%s&limit=%s", PropertyLoader.getAPI_URL(),
-                    searchTerm.replace(' ', '+'), "track", "5");
-            URI requestUri = new URI(uri);
+            URI requestUri = APIHandler.requestURLConstructor("track", "5", searchTerm);
             String token = tokenType + " " + accessToken;
             String contentType = "";
             String method = "GET";
@@ -87,6 +85,7 @@ public class Metadata {
 
                     System.out.println(title + "\n" + albumName + "\n" + albumCoverArtURL + "\n" + releaseDate + "\n"
                             + releaseYear + "\n" + artistName + "\n" + audioPreviewURL);
+                    SongMetadata[] topResults = new SongMetadata[5];
                 } else
                     throw new IllegalStateException("[ERROR] Invalid JSON data while parsing");
             }
