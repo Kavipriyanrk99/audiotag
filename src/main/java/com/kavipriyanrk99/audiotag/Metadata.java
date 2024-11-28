@@ -67,7 +67,7 @@ public class Metadata {
                     String albumName = (String) album.get("name");
                     String releaseDate = (String) album.get("release_date");
                     String releaseYear = releaseDate.substring(0, releaseDate.indexOf('-'));
-                    String albumImageURL = (String) ((JSONObject) images.get(1)).get("url"); // 300 x 300
+                    String albumCoverArtURL = (String) ((JSONObject) images.get(1)).get("url"); // 300 x 300
                     String artistName = null;
                     String audioPreviewURL = null;
 
@@ -84,10 +84,8 @@ public class Metadata {
 
                     if (jsonObjItem.get("preview_url") == null)
                         audioPreviewURL = (String) jsonObjItem.get("preview_url");
-                    else
-                        audioPreviewURL = "No Preview URL";
 
-                    System.out.println(title + "\n" + albumName + "\n" + albumImageURL + "\n" + releaseDate + "\n"
+                    System.out.println(title + "\n" + albumName + "\n" + albumCoverArtURL + "\n" + releaseDate + "\n"
                             + releaseYear + "\n" + artistName + "\n" + audioPreviewURL);
                 } else
                     throw new IllegalStateException("[ERROR] Invalid JSON data while parsing");
