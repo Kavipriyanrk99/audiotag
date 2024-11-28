@@ -11,6 +11,8 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Base64;
 
+import javax.sound.midi.Track;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,7 +37,7 @@ public class APIHandler {
 
         HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
-        if(response.statusCode() != 200)
+        if (response.statusCode() != 200)
             throw new IllegalStateException("[ERROR] Bad API response with status code " + response.statusCode());
 
         return response.body();
@@ -45,18 +47,19 @@ public class APIHandler {
         PropertyLoader.loadProperties();
         try {
             URI requestUri = new URI(PropertyLoader.getAUTH_URL());
-            String token = "Basic " + Base64.getEncoder().encodeToString(new String(PropertyLoader.getCLIENT_ID() + ":" + PropertyLoader.getCLIENT_SECRET()).getBytes());
+            String token = "Basic " + Base64.getEncoder().encodeToString(
+                    new String(PropertyLoader.getCLIENT_ID() + ":" + PropertyLoader.getCLIENT_SECRET()).getBytes());
             String contentType = "application/x-www-form-urlencoded";
             String method = "POST";
             BodyPublisher bodyPublisher = BodyPublishers.ofString("grant_type=client_credentials");
             String responseData = makeHttpRequest(requestUri, token, contentType, method, bodyPublisher);
 
-            if(responseData == null || responseData.isEmpty())
+            if (responseData == null || responseData.isEmpty())
                 throw new IllegalStateException("[ERROR] Invalid reponse data");
 
             JSONObject data = new JSONObject(responseData);
-            accessToken = (String)data.get("access_token");
-            tokenType = (String)data.get("token_type");
+            accessToken = (String) data.get("access_token");
+            tokenType = (String) data.get("token_type");
         } catch (URISyntaxException e) {
             System.out.println(e);
         } catch (IOException e) {
@@ -70,11 +73,26 @@ public class APIHandler {
         }
     }
 
-	public static String getAccessToken() {
-		return accessToken;
-	}
+    public static String getAccessToken() {
+        return accessToken;
+    }
 
-	public static String getTokenType() {
-		return tokenType;
-	}
+    public static String getTokenType() {
+        return tokenType;
+    }
+
+    static URI requestURLConstructor(String type, String limit, String searchTerm) throws URISyntaxException {
+        if (type == null || type.isEmpty())
+            throw new IllegalArgumentException("[ERROR] Invalid url parameter: type");
+
+        if (limit == null || limit.isEmpty() || Integer.parseInt(limit) < 0 || Integer.parseInt(limit) > 50)
+            throw new IllegalArgumentException("[ERROR] Invalid url parameter: limit");
+
+        if (searchTerm == null || searchTerm.isEmpty())
+            throw new IllegalArgumentException("[ERROR] Invalid url parameter: searchTerm");
+
+        String uri = String.format("%sv1/search?q=%s&type=%s&limit=%s", PropertyLoader.getAPI_URL(),
+                searchTerm.replace(' ', '+'), type, limit);
+        return new URI(uri);
+    }
 }
