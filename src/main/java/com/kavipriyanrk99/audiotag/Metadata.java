@@ -5,9 +5,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,7 +13,15 @@ import org.json.JSONObject;
  * Metadata
  */
 public class Metadata {
-    void getMetadata(String searchTerm) {
+	private String searchTerm;
+
+    Metadata(String searchTerm) {
+        if(searchTerm == null || searchTerm.isBlank())
+            throw new IllegalArgumentException("[ERROR] Invalid search term");
+		this.searchTerm = searchTerm;
+    }
+
+    SongMetadata[] getMetadata() {
         APIHandler.setAccessToken();
         String accessToken = APIHandler.getAccessToken();
         String tokenType = APIHandler.getTokenType();
@@ -28,7 +33,9 @@ public class Metadata {
             throw new IllegalArgumentException("[ERROR] Invalid token type");
 
         try {
-            URI requestUri = APIHandler.requestURLConstructor("track", "5", searchTerm);
+            String type = "track";
+            String limit = "5";
+            URI requestUri = APIHandler.requestURLConstructor(type, limit, this.searchTerm);
             String token = tokenType + " " + accessToken;
             String contentType = "";
             String method = "GET";
@@ -41,6 +48,9 @@ public class Metadata {
             JSONObject data = new JSONObject(responseData);
             JSONObject tracks = (JSONObject) data.get("tracks");
             JSONArray items = (JSONArray) tracks.get("items");
+
+            int index = 0;
+            SongMetadata[] topResults = new SongMetadata[Integer.parseInt(limit)];
 
             for (Object item : items) {
                 if (item instanceof JSONObject) {
@@ -85,10 +95,19 @@ public class Metadata {
 
                     System.out.println(title + "\n" + albumName + "\n" + albumCoverArtURL + "\n" + releaseDate + "\n"
                             + releaseYear + "\n" + artistName + "\n" + audioPreviewURL);
-                    SongMetadata[] topResults = new SongMetadata[5];
+
+                    topResults[index].setTitle(title);
+                    topResults[index].setAlbumName(albumName);
+                    topResults[index].setAlbumCoverArtURL(albumCoverArtURL);
+                    topResults[index].setReleaseDate(releaseDate);
+                    topResults[index].setReleaseYear(releaseYear);
+                    topResults[index].setArtistName(artistName);
+                    topResults[index].setAlbumCoverArtURL(albumCoverArtURL);
                 } else
                     throw new IllegalStateException("[ERROR] Invalid JSON data while parsing");
             }
+
+            return topResults;
         } catch (URISyntaxException e) {
             System.out.println(e);
         } catch (IOException e) {
@@ -98,13 +117,10 @@ public class Metadata {
         } catch (IllegalStateException e) {
             System.out.println(e);
         }
+		return null;
     }
 
     void tagger() {
 
-    }
-
-    public static void main(String[] args) {
-        new Metadata().getMetadata("Enemy");
     }
 }
