@@ -100,7 +100,7 @@ public class Metadata {
                     topResults[index].setReleaseDate(releaseDate);
                     topResults[index].setReleaseYear(releaseYear);
                     topResults[index].setArtistName(artistName);
-                    topResults[index].setAlbumCoverArtURL(albumCoverArtURL);
+                    topResults[index].setAudioPreviewURL(audioPreviewURL);
                     index++;
                 } else
                     throw new IllegalStateException("[ERROR] Invalid JSON data while parsing");
