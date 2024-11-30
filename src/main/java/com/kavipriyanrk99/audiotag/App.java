@@ -42,6 +42,45 @@ public class App {
             throw new IllegalArgumentException("[ERROR] Empty filepath");
     }
 
+    public static void printTableOfResults(SongMetadata[] topResults) {
+        if (topResults != null) {
+            for (SongMetadata item : topResults) {
+                int longest = 0;
+                longest = (longest < (item.getTitle()).length()) ? (item.getTitle()).length() : longest;
+                longest = (longest < (item.getAlbumName()).length()) ? (item.getAlbumName()).length() : longest;
+                longest = (longest < (item.getArtistName()).length()) ? (item.getArtistName()).length() : longest;
+                longest = (longest < (item.getReleaseYear()).length()) ? (item.getReleaseYear()).length() : longest;
+                longest = (longest < (item.getReleaseDate()).length()) ? (item.getReleaseDate()).length() : longest;
+                longest = (longest < (item.getAlbumCoverArtURL()).length()) ? (item.getAlbumCoverArtURL()).length() : longest;
+                longest = (longest < (item.getAudioPreviewURL()).length()) ? (item.getAudioPreviewURL()).length() : longest;
+
+                String contentPlaceholder = "| %-20S | " + "%-" + longest + "s" + " |%n";
+
+                System.out.format("+" + "-".repeat(22) + "+" + "-".repeat(longest + 2) + "+%n");
+                System.out.format(contentPlaceholder, "Title", item.getTitle());
+                System.out.format("+" + "-".repeat(22) + "+" + "-".repeat(longest + 2) + "+%n");
+
+                System.out.format(contentPlaceholder, "Album", item.getAlbumName());
+                System.out.format("+" + "-".repeat(22) + "+" + "-".repeat(longest + 2) + "+%n");
+
+                System.out.format(contentPlaceholder, "Artist(s)", item.getArtistName());
+                System.out.format("+" + "-".repeat(22) + "+" + "-".repeat(longest + 2) + "+%n");
+
+                System.out.format(contentPlaceholder, "Year", item.getReleaseYear());
+                System.out.format("+" + "-".repeat(22) + "+" + "-".repeat(longest + 2) + "+%n");
+
+                System.out.format(contentPlaceholder, "Date", item.getReleaseDate());
+                System.out.format("+" + "-".repeat(22) + "+" + "-".repeat(longest + 2) + "+%n");
+
+                System.out.format(contentPlaceholder, "Cover Art Preview", item.getAlbumCoverArtURL());
+                System.out.format("+" + "-".repeat(22) + "+" + "-".repeat(longest + 2) + "+%n");
+
+                System.out.format(contentPlaceholder, "Audio Preview", item.getAudioPreviewURL());
+                System.out.format("+" + "-".repeat(22) + "+" + "-".repeat(longest + 2) + "+%n%n");
+            }
+        }
+    }
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
@@ -69,20 +108,12 @@ public class App {
                 System.out.println("CUSTOM TAG (yes/no) :   " + songDetails.get("customtag"));
 
                 System.out.println();
-                System.out.println("> ENTER SEARCH TERM (related to song):");
+                System.out.println("> ENTER SEARCH TERM RELATED TO SONG:");
 
                 String searchTerm = sc.nextLine();
                 Metadata metadataObj = new Metadata(searchTerm);
                 SongMetadata[] topResultSongMetadatas = metadataObj.getMetadata();
-                for(SongMetadata metadata : topResultSongMetadatas){
-                    System.out.println(metadata.getTitle());
-                    System.out.println(metadata.getAlbumName());
-                    System.out.println(metadata.getArtistName());
-                    System.out.println(metadata.getReleaseDate());
-                    System.out.println(metadata.getReleaseYear());
-                    System.out.println(metadata.getAlbumCoverArtURL());
-                    System.out.println(metadata.getAudioPreviewURL());
-                }
+                printTableOfResults(topResultSongMetadatas);
             }
         } catch (FileNotFoundException e) {
             System.out.println(e);
