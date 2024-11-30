@@ -56,7 +56,7 @@ public class App {
                     audiofile.setSongDetails(filename, filepath, format);
             }
 
-            if(audiofile != null) {
+            if (audiofile != null) {
                 System.out.println("<-------------------------- SONG DETAILS -------------------------->");
                 Map<String, String> songDetails = audiofile.getSongDetails();
                 System.out.println("MUSIC FILE NAME     :   " + songDetails.get("filename"));
@@ -67,6 +67,22 @@ public class App {
                 System.out.println("ID3V1 TAG (yes/no)  :   " + songDetails.get("id3v1"));
                 System.out.println("ID3V2 TAG (yes/no)  :   " + songDetails.get("id3v2"));
                 System.out.println("CUSTOM TAG (yes/no) :   " + songDetails.get("customtag"));
+
+                System.out.println();
+                System.out.println("> ENTER SEARCH TERM (related to song):");
+
+                String searchTerm = sc.nextLine();
+                Metadata metadataObj = new Metadata(searchTerm);
+                SongMetadata[] topResultSongMetadatas = metadataObj.getMetadata();
+                for(SongMetadata metadata : topResultSongMetadatas){
+                    System.out.println(metadata.getTitle());
+                    System.out.println(metadata.getAlbumName());
+                    System.out.println(metadata.getArtistName());
+                    System.out.println(metadata.getReleaseDate());
+                    System.out.println(metadata.getReleaseYear());
+                    System.out.println(metadata.getAlbumCoverArtURL());
+                    System.out.println(metadata.getAudioPreviewURL());
+                }
             }
         } catch (FileNotFoundException e) {
             System.out.println(e);
