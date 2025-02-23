@@ -1,5 +1,6 @@
 package com.kavipriyanrk99.audiotag;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -9,16 +10,23 @@ import java.net.http.HttpRequest.BodyPublishers;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.mpatric.mp3agic.ID3Wrapper;
+import com.mpatric.mp3agic.ID3v1Tag;
+import com.mpatric.mp3agic.ID3v24Tag;
+import com.mpatric.mp3agic.Mp3File;
+import com.mpatric.mp3agic.NotSupportedException;
+
 /**
  * Metadata
  */
 public class Metadata {
-	private String searchTerm;
+    private String searchTerm;
+    private final String TAG_INDICATOR = "TAGGED";
 
     Metadata(String searchTerm) {
-        if(searchTerm == null || searchTerm.isBlank())
+        if (searchTerm == null || searchTerm.isBlank())
             throw new IllegalArgumentException("[ERROR] Invalid search term");
-		this.searchTerm = searchTerm;
+        this.searchTerm = searchTerm;
     }
 
     SongMetadata[] getMetadata() {
@@ -92,7 +100,7 @@ public class Metadata {
 
                     if (jsonObjItem.get("preview_url") == null)
                         audioPreviewURL = (String) jsonObjItem.get("preview_url");
-                
+
                     topResults[index] = new SongMetadata();
                     topResults[index].setTitle(title);
                     topResults[index].setAlbumName(albumName);
@@ -116,10 +124,36 @@ public class Metadata {
         } catch (IllegalStateException e) {
             System.out.println(e);
         }
-		return null;
+
+        return null;
     }
 
-    void tagger() {
+    private ID3Wrapper setCoverArt(ID3Wrapper id3Wrapper, String imageURL) {
+        byte[] imageBytes = null;
+        imageBytes = AudioUtils.getImageFromURL(imageURL);
+        id3Wrapper.setAlbumImage(imageBytes, "image/jpeg");
+        return id3Wrapper;
+    }
 
+    Mp3File tagger(SongMetadata songMetadata, Mp3AudioFile audioFile) {
+        if (songMetadata != null && audioFile != null) {
+            Mp3File mp3File = audioFile.mp3file;
+
+            ID3Wrapper id3Wrapper = new ID3Wrapper(new ID3v1Tag(), new ID3v24Tag());
+            id3Wrapper.setTitle(songMetadata.getTitle());
+            id3Wrapper.setAlbum(songMetadata.getAlbumName());
+            id3Wrapper.setAlbumArtist(songMetadata.getArtistName());
+            id3Wrapper.setYear(songMetadata.getReleaseDate());
+            id3Wrapper = setCoverArt(id3Wrapper, songMetadata.getAlbumCoverArtURL());
+            id3Wrapper.getId3v2Tag().setPadding(true);
+
+            if (audioFile.hasID3v1)
+                mp3File.setId3v1Tag(id3Wrapper.getId3v1Tag());
+
+            if (audioFile.hasID3v2)
+                mp3File.setId3v2Tag(id3Wrapper.getId3v2Tag());
+
+            return mp3File;
+        }
     }
 }

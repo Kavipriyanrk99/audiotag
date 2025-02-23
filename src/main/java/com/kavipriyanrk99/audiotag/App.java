@@ -51,8 +51,10 @@ public class App {
                 longest = (longest < (item.getArtistName()).length()) ? (item.getArtistName()).length() : longest;
                 longest = (longest < (item.getReleaseYear()).length()) ? (item.getReleaseYear()).length() : longest;
                 longest = (longest < (item.getReleaseDate()).length()) ? (item.getReleaseDate()).length() : longest;
-                longest = (longest < (item.getAlbumCoverArtURL()).length()) ? (item.getAlbumCoverArtURL()).length() : longest;
-                longest = (longest < (item.getAudioPreviewURL()).length()) ? (item.getAudioPreviewURL()).length() : longest;
+                longest = (longest < (item.getAlbumCoverArtURL()).length()) ? (item.getAlbumCoverArtURL()).length()
+                        : longest;
+                longest = (longest < (item.getAudioPreviewURL()).length()) ? (item.getAudioPreviewURL()).length()
+                        : longest;
 
                 String contentPlaceholder = "| %-20S | " + "%-" + longest + "s" + " |%n";
 
@@ -111,9 +113,25 @@ public class App {
                 System.out.println("> ENTER SEARCH TERM RELATED TO SONG:");
 
                 String searchTerm = sc.nextLine();
-                Metadata metadataObj = new Metadata(searchTerm);
-                SongMetadata[] topResultSongMetadatas = metadataObj.getMetadata();
+                Metadata metadata = new Metadata(searchTerm);
+                SongMetadata[] topResultSongMetadatas = metadata.getMetadata();
                 printTableOfResults(topResultSongMetadatas);
+
+                // TESTING
+                int resultChoice = sc.nextInt();
+                metadata.tagger(topResultSongMetadatas[resultChoice], (Mp3AudioFile) audiofile);
+
+                String filename = mp3File.getFilename();
+                String newFilename = filename.substring(0, filename.lastIndexOf(".")) + "-" + TAG_INDICATOR
+                        + filename.substring(filename.lastIndexOf("."));
+
+                try {
+                    mp3File.save(newFilename);
+                } catch (NotSupportedException e) {
+                    System.out.println("[ERROR] error processing the file");
+                } catch (IOException e) {
+                    System.out.println(e);
+                }
             }
         } catch (FileNotFoundException e) {
             System.out.println(e);
